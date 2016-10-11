@@ -1,7 +1,25 @@
+#include <iostream>
+#include <fstream>
 #include <Windows.h>
 #define GMEXPORT extern "C" __declspec (dllexport)
 
 GMEXPORT double registerURIScheme(wchar_t scheme[]) {
+
+	char exePathBuffer[MAX_PATH * 2];
+	GetModuleFileNameA(NULL, exePathBuffer, MAX_PATH * 2);
+
+	char* cmd = GetCommandLineA();
+
+	std::ofstream myfile;
+	myfile.open("debug.txt");
+	myfile << exePathBuffer << "\n" << cmd << "\n";
+	myfile.close();
+
+	return 1;
+
+}
+GMEXPORT double test(wchar_t scheme[]) {
+
 
 	// Prepare DefaultIcon path
 	wchar_t schemeDefaultIcon[48] = L"";
@@ -31,7 +49,7 @@ GMEXPORT double registerURIScheme(wchar_t scheme[]) {
 	if(urlProtocol == ERROR_NO_MATCH || urlProtocol == ERROR_FILE_NOT_FOUND){
 
 		// Create the key
-		if (RegCreateKeyEx(HKEY_CLASSES_ROOT, scheme, 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) {
+		if (RegCreateKeyEx(HKEY_CLASSES_ROOT, scheme, 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL) == ERROR_SUCCESS) {
 
 			// Set default value (description)
 			long setDescription = RegSetValueEx(hKey, scheme, 0, REG_SZ, (LPBYTE)schemeDescription, wcslen(schemeDescription)*sizeof(char));
@@ -40,7 +58,7 @@ GMEXPORT double registerURIScheme(wchar_t scheme[]) {
 			long setUrlProtocol = RegSetValueEx(hKey, TEXT("URL Protocol"), 0, REG_SZ, (LPBYTE)"", 0);
 
 			// Did all of that work?
-			if (setDescription != ERROR_SUCCESS && setUrlProtocol != ERROR_SUCCESS) {
+			if (setDescription == ERROR_SUCCESS && setUrlProtocol == ERROR_SUCCESS) {
 				
 				// So let's try stopping here. If I'm correct this should already create the first required registry entry.
 				// Spoiler alert: it doesn't :(
