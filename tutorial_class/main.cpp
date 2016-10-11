@@ -1,23 +1,45 @@
+// Not sure how many of these I still need cause I copied a lot of tutorials and shit but that doesn't really matter at this point
 #include <iostream>
 #include <fstream>
+#include<stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include <Windows.h>
+
+// This is needed according to the GM DLL tutorial
 #define GMEXPORT extern "C" __declspec (dllexport)
 
 GMEXPORT double registerURIScheme(wchar_t scheme[]) {
 
-	char exePathBuffer[MAX_PATH * 2];
-	GetModuleFileNameA(NULL, exePathBuffer, MAX_PATH * 2);
+	wchar_t exePathBuffer[MAX_PATH * 2];
+	// GetModuleFileNameA(NULL, exePathBuffer, MAX_PATH * 2);
+	GetModuleFileName(NULL, exePathBuffer, MAX_PATH * 2);
 
-	char* cmd = GetCommandLineA();
-
+	// Output file for debugging this cause I don't know how else I would do it
 	std::ofstream myfile;
 	myfile.open("debug.txt");
-	myfile << exePathBuffer << "\n" << cmd << "\n";
+	myfile << "PATH: " << exePathBuffer << "\n";
+
+
+	// So this works, but it only opens the exe, it doesn't use the CLI args
+	ShellExecute(NULL, L"runas", exePathBuffer, NULL, NULL, SW_SHOWNORMAL);
+
+	// There's this charming little fella who looks like he could help me out here
+	// But I haven't managed to get anywhere with this
+	char* cmd = GetCommandLineA();
+
+	// Test code - this works fine
+	// ShellExecute(NULL, L"runas", L"D:\\Program Files (x86)\\Notepad++\\notepad++.exe", L"C:\\Windows\\System32\\drivers\\etc\\hosts", NULL, SW_SHOWNORMAL);
+
+	// Don't forget to close the file
 	myfile.close();
+
 
 	return 1;
 
 }
+
+// This is my other test code which I separated cause I'm focusing on the top bit currently
 GMEXPORT double test(wchar_t scheme[]) {
 
 
