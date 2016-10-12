@@ -61,6 +61,7 @@ GMEXPORT double registerURIScheme(char scheme[]) {
 	debug << "DEFAULTICON: " << schemeDefaultIcon << "\n";
 	debug << "OPENCOMMAND: " << schemeOpenCommand << "\n";
 	debug << "DESCRIPTION: " << schemeDescription << "\n";
+	debug << "\nSTART inserting registry items";
 
 	// Check if a URI scheme handler already exists
 	// Because if one exists, we shouldn't overwrite it
