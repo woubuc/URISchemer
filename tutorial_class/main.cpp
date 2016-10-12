@@ -28,27 +28,27 @@ GMEXPORT double requestAdminRights() {
 }
 
 // Register the URI scheme
-GMEXPORT double registerURIScheme(wchar_t scheme[]) {
+GMEXPORT double registerURIScheme(char scheme[]) {
 
 	// Prepare DefaultIcon path
-	wchar_t schemeDefaultIcon[48] = L"";
-	wcsncpy_s(schemeDefaultIcon, scheme, 32);
-	wcscat_s(schemeDefaultIcon, L"\\DefaultIcon");
+	char schemeDefaultIcon[48] = "";
+	strncpy_s(schemeDefaultIcon, scheme, 32);
+	strcat_s(schemeDefaultIcon, "\\DefaultIcon");
 
 	// Prepare Shell command path
-	wchar_t schemeOpenCommand[64] = L"";
-	wcsncpy_s(schemeOpenCommand, scheme, 32);
-	wcscat_s(schemeOpenCommand, L"\\shell\\open\\command");
+	char schemeOpenCommand[64] = "";
+	strncpy_s(schemeOpenCommand, scheme, 32);
+	strcat_s(schemeOpenCommand, "\\shell\\open\\command");
 
 	// Prepare description
-	wchar_t schemeDescription[52] = L"URL:";
-	wcsncat_s(schemeDescription, scheme, 32);
-	wcscat_s(schemeDescription, L" Protocol");
+	char schemeDescription[52] = "URL:";
+	strncat_s(schemeDescription, scheme, 32);
+	strcat_s(schemeDescription, " Protocol");
 
 
 	// Get current filename & path
-	wchar_t applicationPath[MAX_PATH * 2];
-	GetModuleFileName(NULL, applicationPath, MAX_PATH * 2);
+	char applicationPath[MAX_PATH * 2];
+	GetModuleFileNameA(NULL, applicationPath, MAX_PATH * 2);
 
 
 	// Prepare vars
@@ -58,31 +58,39 @@ GMEXPORT double registerURIScheme(wchar_t scheme[]) {
 	std::ofstream debug;
 	debug.open("debug.txt");
 	debug << "SCHEME: " << scheme << "\n";
-	debug << "DEFAULTICON: " << &schemeDefaultIcon << "\n";
-	debug << "OPENCOMMAND: " << &schemeOpenCommand << "\n";
-	debug << "DESCRIPTION: " << &schemeDescription << "\n";
+	debug << "DEFAULTICON: " << schemeDefaultIcon << "\n";
+	debug << "OPENCOMMAND: " << schemeOpenCommand << "\n";
+	debug << "DESCRIPTION: " << schemeDescription << "\n";
 
 	// Check if a URI scheme handler already exists
 	// Because if one exists, we shouldn't overwrite it
-	long urlProtocol = RegOpenKeyEx(HKEY_CLASSES_ROOT, scheme, 0, KEY_READ, &hKey);
+	long urlProtocol = RegOpenKeyExA(HKEY_CLASSES_ROOT, scheme, 0, KEY_READ, &hKey);
 	if (urlProtocol != ERROR_NO_MATCH && urlProtocol != ERROR_FILE_NOT_FOUND)
 		debug << "Protocol already exists";
 		return 0;
 
+	debug << "Protocol not found\n";
+
 	// Create the base key
-	if (RegCreateKeyEx(HKEY_CLASSES_ROOT, scheme, 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS)
-		debug << "Error creating regex key";
+	if (RegCreateKeyExA(HKEY_CLASSES_ROOT, scheme, 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS)
+		debug << "Error creating registry key";
 		return 0;
 
+	debug << "Registry key created";
+
 	// Set default value (description)
-	if (RegSetValueEx(hKey, scheme, 0, REG_SZ, (LPBYTE)schemeDescription, wcslen(schemeDescription)*sizeof(char)) != ERROR_SUCCESS)
+	if (RegSetValueExA(hKey, scheme, 0, REG_SZ, (LPBYTE)schemeDescription, strlen(schemeDescription)*sizeof(char)) != ERROR_SUCCESS)
 		debug << "Error setting default value";
 		return 0;
 
+	debug << "Default value set";
+
 	// Set URL protocol to an empty value, which is required for URI schemes for some reason
-	if (RegSetValueEx(hKey, TEXT("URL Protocol"), 0, REG_SZ, (LPBYTE)"", 0) != ERROR_SUCCESS)
+	if (RegSetValueExA(hKey, "URL Protocol", 0, REG_SZ, (LPBYTE)"", 0) != ERROR_SUCCESS)
 		debug << "Error setting URL protocol";
 		return 0;
+
+	debug << "URL protocol set";
 
 	
 	debug << "Success!";
