@@ -1,10 +1,12 @@
 // Much thanks to the awesome tutorial at http://gmc.yoyogames.com/index.php?showtopic=405812
 
 #include <fstream>
+#include <string>
 #include <Windows.h>
 
 #define GMEXPORT extern "C" __declspec (dllexport)
 
+using namespace std;
 
 // Relaunch the application with admin rights
 GMEXPORT double requestAdminRights() {
@@ -24,27 +26,32 @@ GMEXPORT double requestAdminRights() {
 	// Relaunch the .exe as admin (asks for admin rights if they weren't granted already)
 	ShellExecute(NULL, L"runas", applicationPath, cmdParams, NULL, SW_SHOWNORMAL);
 
+	// Exit this process because we have the new process now
+	// std::exit(0);
+
 	return 1;
 }
 
 // Register the URI scheme
-GMEXPORT double registerURIScheme(char scheme[]) {
+GMEXPORT double registerURIScheme(char schemeChar[]) {
+
+	// Make it a string because char sucks
+	string scheme = string(schemeChar);
 
 	// Prepare DefaultIcon path
-	char schemeDefaultIcon[48] = "";
-	strncpy_s(schemeDefaultIcon, scheme, 32);
-	strcat_s(schemeDefaultIcon, "\\DefaultIcon");
+	string schemeDefaultIcon = string("");
+	schemeDefaultIcon += scheme;
+	schemeDefaultIcon += "\\DefaultIcon";
 
-	// Prepare Shell command path
-	char schemeOpenCommand[64] = "";
-	strncpy_s(schemeOpenCommand, scheme, 32);
-	strcat_s(schemeOpenCommand, "\\shell\\open\\command");
+	// Prepare shell command path
+	string schemeOpenCommand = string("");
+	schemeOpenCommand += scheme;
+	schemeOpenCommand += "\\shell\\open\\command";
 
 	// Prepare description
-	char schemeDescription[52] = "URL:";
-	strncat_s(schemeDescription, scheme, 32);
-	strcat_s(schemeDescription, " Protocol");
-
+	string schemeDescription = string("URL:");
+	schemeDescription += scheme;
+	schemeDescription += " Protocol";
 
 	// Get current filename & path
 	char applicationPath[MAX_PATH * 2];
@@ -55,7 +62,7 @@ GMEXPORT double registerURIScheme(char scheme[]) {
 	bool success = false;
 	HKEY hKey = NULL;
 
-	std::ofstream debug;
+	ofstream debug;
 	debug.open("debug.txt");
 	debug << "SCHEME: " << scheme << "\n";
 	debug << "DEFAULTICON: " << schemeDefaultIcon << "\n";
@@ -65,7 +72,7 @@ GMEXPORT double registerURIScheme(char scheme[]) {
 
 	// Check if a URI scheme handler already exists
 	// Because if one exists, we shouldn't overwrite it
-	long urlProtocol = RegOpenKeyExA(HKEY_CLASSES_ROOT, scheme, 0, KEY_READ, &hKey);
+	long urlProtocol = RegOpenKeyExA(HKEY_CLASSES_ROOT, scheme.c_str(), NULL, KEY_READ, &hKey);
 	if (urlProtocol != ERROR_NO_MATCH && urlProtocol != ERROR_FILE_NOT_FOUND)
 		debug << "Protocol already exists";
 		return 0;
@@ -73,14 +80,14 @@ GMEXPORT double registerURIScheme(char scheme[]) {
 	debug << "Protocol not found\n";
 
 	// Create the base key
-	if (RegCreateKeyExA(HKEY_CLASSES_ROOT, scheme, 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS)
+	if (RegCreateKeyExA(HKEY_CLASSES_ROOT, scheme.c_str(), 0L, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS)
 		debug << "Error creating registry key";
 		return 0;
 
 	debug << "Registry key created";
 
 	// Set default value (description)
-	if (RegSetValueExA(hKey, scheme, 0, REG_SZ, (LPBYTE)schemeDescription, strlen(schemeDescription)*sizeof(char)) != ERROR_SUCCESS)
+	if (RegSetValueExA(hKey, scheme.c_str(), 0, REG_SZ, (LPBYTE)schemeDescription.c_str(), strlen(schemeDescription.c_str())*sizeof(char)) != ERROR_SUCCESS)
 		debug << "Error setting default value";
 		return 0;
 
