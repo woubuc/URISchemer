@@ -2,7 +2,7 @@
 URISchemer is a DLL that allows you to create a URI scheme in Windows right from your game.
 
 ## What is a URI scheme
-A URI scheme is a type of link to easily open a program and pass it some data. An example of a program that does this is Steam: [steam://open/games](steam://open/games).
+A URI scheme is a type of link to easily open a program and pass it some data. An example of a program that does this is [Steam](https://developer.valvesoftware.com/wiki/Steam_browser_protocol).
 
 ## Where to get
 Grab the DLL from the [releases](https://github.com/woubuc/URISchemer/releases) page.
