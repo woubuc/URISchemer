@@ -40,3 +40,6 @@ Restarts the application in admin mode, popping up a UAC request if appropriate.
 **Note**: it does not exit the current process.
 
 Takes no arguments and always returns 1.
+
+## Disclaimer
+This is my first attempt at writing C++. As such, it may contain bugs and it almost definitely isn't following any kind of best practices. If you see room for improvement, don't hesitate to let me know or submit a PR. 
