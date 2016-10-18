@@ -1,5 +1,5 @@
-# URISchemer for GMS
-URISchemer is a DLL that allows you to create a URI scheme in Windows right from your game.
+# URISchemer for GM:S
+URISchemer is a DLL that allows you to create a URI scheme in Windows right from your Gamemaker: Studio game.
 
 ## What is a URI scheme
 A URI scheme is a type of link to easily open a program and pass it some data. An example of a program that does this is [Steam](https://developer.valvesoftware.com/wiki/Steam_browser_protocol).
@@ -42,4 +42,6 @@ Restarts the application in admin mode, popping up a UAC request if appropriate.
 Takes no arguments and always returns 1.
 
 ## Disclaimer
-This is my first attempt at writing C++. As such, it may contain bugs and it almost definitely isn't following any kind of best practices. If you see room for improvement, don't hesitate to let me know or submit a PR. 
+This is my first attempt at writing C++. As such, it may contain bugs and it almost definitely isn't following any kind of best practices. If you see room for improvement, don't hesitate to let me know or submit a PR.
+
+This DLL is also largely untested at this point. I've only had the chance to test it on my on Windows 7 computer. If you find it doesn't work on your system, be sure to let me know.
